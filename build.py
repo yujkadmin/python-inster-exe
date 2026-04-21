@@ -17,6 +17,11 @@ import shutil
 import subprocess
 from pathlib import Path
 
+# Windows 控制台 UTF-8 编码修复
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+
 PROJECT_ROOT = Path(__file__).parent
 DIST_DIR = PROJECT_ROOT / "dist"
 BUILD_DIR = PROJECT_ROOT / "build"

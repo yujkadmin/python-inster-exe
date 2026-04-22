@@ -7,7 +7,7 @@ PyInstaller 打包脚本
     python build.py
 
 输出:
-    dist/WaferClassifier.exe   (Windows: 单文件可执行程序)
+    dist/WaferClassifier/      (Windows: 文件夹，内含 WaferClassifier.exe)
     dist/WaferClassifier.app/  (macOS: .app 应用包)
 """
 
@@ -66,9 +66,8 @@ def run_pyinstaller():
         str(PROJECT_ROOT / "main.py"),
     ]
 
-    # Windows: 单文件可执行程序
-    if sys.platform == "win32":
-        cmd.insert(cmd.index("--windowed"), "--onefile")
+    # Windows: 文件夹模式（onedir），稳定性远优于单文件模式
+    # 客户解压 zip 后双击 WaferClassifier.exe 即可运行
 
     # macOS 特定选项
     if sys.platform == "darwin":

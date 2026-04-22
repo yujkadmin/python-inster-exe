@@ -37,17 +37,21 @@ jobs:
       - name: Build with PyInstaller
         run: python build.py
 
+      - name: Zip output folder
+        run: |
+          Compress-Archive -Path "dist\WaferClassifier\*" -DestinationPath "dist\WaferClassifier-Windows.zip" -Force
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: WaferClassifier-Windows
-          path: dist/WaferClassifier.exe
+          path: dist\WaferClassifier-Windows.zip
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/WaferClassifier.exe
+          files: dist\WaferClassifier-Windows.zip
           name: ${{ github.ref_name }}
           generate_release_notes: true
         env:

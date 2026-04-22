@@ -30,8 +30,6 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QThread, Signal, QMutex, QMutexLocker
 from PySide6.QtGui import QFont, QIcon, QPixmap, QColor
 
-from core import batch_classify, get_image_files, USER_CATEGORIES
-
 
 # ========== 样式表 ==========
 STYLE_SHEET = """
@@ -156,6 +154,7 @@ class ClassifyWorker(QThread):
 
     def run(self):
         try:
+            from core import batch_classify  # 延迟导入，避免启动慢
             # 根据 CPU 核心数自动设置线程数，最少 2 个，最多 8 个
             max_workers = max(2, min(os.cpu_count() or 4, 8))
             results = batch_classify(
@@ -313,6 +312,7 @@ class MainWindow(QMainWindow):
         if dir_path:
             path = Path(dir_path)
             self.input_edit.setText(str(path))
+            from core import get_image_files  # 延迟导入
             files = get_image_files(path)
             self.input_count_label.setText(f"图像: {len(files)} 张")
             self._log(f"已选择输入目录: {path} (共 {len(files)} 张图像)")
@@ -340,11 +340,14 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "提示", "请先选择输出目录")
             return
 
+        from core import get_image_files  # 延迟导入
         image_files = get_image_files(input_dir)
         if not image_files:
             QMessageBox.warning(self, "提示", "输入目录中没有支持的图像文件")
             return
 
+        self.status_label.setText("正在加载 AI 模型，请稍候...")
+        self._log("正在加载 AI 模型...")
         self.start_btn.setEnabled(False)
         self.stop_btn.setEnabled(True)
         self.input_btn.setEnabled(False)

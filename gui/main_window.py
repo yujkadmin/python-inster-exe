@@ -10,6 +10,7 @@ from typing import Optional
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
+    QSplashScreen,
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
@@ -27,7 +28,7 @@ from PySide6.QtWidgets import (
     QSplitter,
 )
 from PySide6.QtCore import Qt, QThread, Signal, QMutex, QMutexLocker
-from PySide6.QtGui import QFont, QIcon
+from PySide6.QtGui import QFont, QIcon, QPixmap, QColor
 
 from core import batch_classify, get_image_files, USER_CATEGORIES
 
@@ -478,6 +479,26 @@ class MainWindow(QMainWindow):
 def run_app():
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
+
+    # 启动画面：提示用户程序正在加载
+    pixmap = QPixmap(480, 240)
+    pixmap.fill(QColor("#487eb0"))
+    splash = QSplashScreen(pixmap)
+    splash.setWindowFlag(Qt.WindowStaysOnTopHint)
+
+    font = QFont("Microsoft YaHei", 14, QFont.Bold)
+    splash.setFont(font)
+    splash.showMessage(
+        "晶圆缺陷自动分类系统\n\n正在初始化，请稍候...",
+        Qt.AlignCenter,
+        QColor("#ffffff"),
+    )
+    splash.show()
+    app.processEvents()
+
+    # 创建主窗口（此过程可能较耗时）
     window = MainWindow()
     window.show()
+
+    splash.finish(window)
     sys.exit(app.exec())
